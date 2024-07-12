@@ -7,10 +7,9 @@ public class MedusaController_Script : MonoBehaviour
     public float accelerationY;
     public float speed = 10f;
     public float maxSpeed = 50f;
-    public float torqueForce = 100f;
+    public float horizontalTorqueForce = 100f;
+    public float verticalTorqueForce = 100f;
     public float maxTorque = 50f;
-    public Vector3 targetVector = Vector3.forward; // Desired orientation vector
-    public float orientationSpeed = 1f; // Speed of orientation correction
 
     private Rigidbody rb;
 
@@ -29,8 +28,11 @@ public class MedusaController_Script : MonoBehaviour
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
 
-        // Calculate torque force 
-        Vector3 torque = new Vector3(verticalInput * torqueForce, 0f, -horizontalInput * torqueForce);
+        // Calculate torque forces 
+        float yTorque = - horizontalInput * horizontalTorqueForce; // Torque around y-axis (horizontal)
+        float xTorque = verticalInput * verticalTorqueForce;   // Torque around x-axis (vertical)
+
+        Vector3 torque = new Vector3(xTorque, yTorque, 0f);
 
         // Cap torque force
         if (torque.magnitude > maxTorque)
@@ -55,15 +57,5 @@ public class MedusaController_Script : MonoBehaviour
             // Apply acceleration 
             rb.AddForce(acceleration, ForceMode.Acceleration);
         }
-
-        // Apply orientation correction towards the target vector
-        ApplyOrientationCorrection();
-    }
-
-    void ApplyOrientationCorrection()
-    {
-     
-        Quaternion targetRotation = Quaternion.LookRotation(targetVector);
-        rb.rotation = Quaternion.Slerp(rb.rotation, targetRotation, orientationSpeed * Time.deltaTime);
     }
 }
